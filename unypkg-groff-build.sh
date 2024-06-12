@@ -35,13 +35,13 @@ mkdir -pv /uny/sources
 cd /uny/sources || exit
 
 pkgname="groff"
-pkggit="https://github.com/groff/groff.git refs/tags/*"
+pkggit="https://git.savannah.gnu.org/git/groff.git refs/tags/*"
 gitdepth="--depth=1"
 
 ### Get version info from git remote
 # shellcheck disable=SC2086
-latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "v[0-9.]+$" | tail --lines=1)"
-latest_ver="$(echo "$latest_head" | grep -o "v[0-9.].*" | sed "s|v||")"
+latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "/[0-9.]+$" | tail --lines=1)"
+latest_ver="$(echo "$latest_head" | grep -o "/[0-9.].*" | sed "s|/||")"
 latest_commit_id="$(echo "$latest_head" | cut --fields=1)"
 
 version_details
@@ -51,9 +51,9 @@ echo "newer" >release-"$pkgname"
 
 git_clone_source_repo
 
-#cd "$pkgname" || exit
-#./autogen.sh
-#cd /uny/sources || exit
+cd "$pkgname" || exit
+./bootstrap
+cd /uny/sources || exit
 
 archiving_source
 
@@ -77,7 +77,7 @@ get_include_paths
 
 unset LD_RUN_PATH
 
-./configure \
+PAGE=A4 ./configure \
     --prefix=/uny/pkg/"$pkgname"/"$pkgver"
 
 make -j"$(nproc)"
